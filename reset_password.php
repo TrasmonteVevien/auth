@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo "<p style='text-align:center; font-family:sans-serif;'>✅ New password: <strong>$newPassword</strong><br><a href='index.php'>Go back to login</a></p>";
         exit();
     } else {
-        echo "<p style='text-align:center; font-family:sans-serif; color:red;'>❌ Username and phone do not match. <a href='index.php'>Try again</a></p>";
+        echo "<p style='text-align:center; font-family:sans-serif; color:red;'>❌ Username and phone number don't match. <a href='index.php'>Try again later.</a></p>";
         exit();
     }
 }

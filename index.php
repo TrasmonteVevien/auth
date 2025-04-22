@@ -12,7 +12,7 @@ if (isset($_SESSION['lockout_time'])) {
     $time_diff = time() - $_SESSION['lockout_time'];
     if ($time_diff < 10) {
         $lockout_remaining = 10 - $time_diff;
-        $error_message = "⏳ Too many failed attempts. Please wait <span id='timer'>$lockout_remaining</span> seconds.";
+        $error_message = "⏳ Failed attempt. Please wait <span id='timer'>$lockout_remaining</span> seconds.";
     } else {
         unset($_SESSION['lockout_time']);
         $_SESSION['failed_attempts'] = 0;
@@ -44,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $lockout_remaining === 0) {
             if ($_SESSION['failed_attempts'] >= 2) {
                 $_SESSION['lockout_time'] = time();
                 $lockout_remaining = 10;
-                $error_message = "⏳ Too many failed attempts. Please wait <span id='timer'>$lockout_remaining</span> seconds.";
+                $error_message = "⏳ Failed attempt. Please wait <span id='timer'>$lockout_remaining</span> seconds.";
             } else {
-                $error_message = "⚠️ Invalid credentials. Attempt {$_SESSION['failed_attempts']} of 2.";
+                $error_message = "⚠️ Invalid credentials. Attempt {$_SESSION['failed_attempts']} of 1.";
                 $show_reset_popup = true;
             }
         }

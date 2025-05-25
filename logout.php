@@ -51,11 +51,13 @@ session_destroy(); // Clear the session
     </style>
 </head>
 <body>
-    <h1>You have been logged out</h1>
+
+   <h1>You have been logged out</h1>
     <div class="button-container">
-        <a href="index.php" class="button">Login Again</a>
-        <a href="exit.php" class="button" onclick="window.close(); return false;">Exit</a>
-    </div>
+    <a href="login.php" class="button">Login Again</a>
+    <a href="index.php" class="button">Exit</a>
+</div>
+
 </body>
 </html>
 

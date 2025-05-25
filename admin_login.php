@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $password = trim($_POST['password']);
 
     // Fetch admin credentials from database
-    $stmt = $pdo->prepare("SELECT * FROM admin WHERE username = ?");
+    $stmt = $pdo->prepare("SELECT * FROM admins WHERE username = ?");
     $stmt->execute([$username]);
     $admin = $stmt->fetch();
 
@@ -38,56 +38,74 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
-    <style>
-        body {
-            background-color: #e9ecef;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
-        .login-container {
-            background-color: #ffffff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            width: 400px;
-            text-align: center;
-        }
-        h2 {
-            margin-bottom: 20px;
-        }
-        input[type="text"], input[type="password"] {
-            width: calc(100% - 20px);
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #cccccc;
-            border-radius: 4px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        .error-message {
-            color: red;
-            margin: 10px 0;
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Admin Login</title>
+<style>
+    body {
+        background-color: #004080; /* deep blue background */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: #004080; /* blue text */
+    }
+    .login-container {
+        background-color: #ffffff; /* white box */
+        padding: 30px;
+        border-radius: 10px;
+        width: 400px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        text-align: center;
+        border: 3px solid #ffd633; /* yellow border */
+    }
+    h2 {
+        margin-bottom: 20px;
+        color: #004080;
+        font-weight: bold;
+    }
+    input[type="text"], input[type="password"] {
+        width: calc(100% - 22px);
+        padding: 10px;
+        margin: 10px 0;
+        border: 2px solid #ffd633; /* yellow border */
+        border-radius: 6px;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+    input[type="text"]:focus, input[type="password"]:focus {
+        border-color: #ffeb3b; /* bright yellow on focus */
+        outline: none;
+        background-color: #fffde7;
+    }
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #ffd633; /* yellow button */
+        color: #004080; /* blue text */
+        border: none;
+        border-radius: 6px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin-top: 10px;
+    }
+    button:hover {
+        background-color: #e6c200; /* darker yellow on hover */
+    }
+    .error-message {
+        color: #cc3300; /* dark red */
+        background-color: #fff0b3; /* pale yellow background */
+        padding: 10px;
+        margin: 15px 0;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+</style>
 </head>
 <body>
     <div class="login-container">
@@ -96,8 +114,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="error-message"><?= htmlspecialchars($error_message); ?></div>
         <?php endif; ?>
         <form method="post">
-            <input type="text" name="username" placeholder="Username" required><br>
-            <input type="password" name="password" placeholder="Password" required><br>
+            <input type="text" name="username" placeholder="Username" required /><br />
+            <input type="password" name="password" placeholder="Password" required /><br />
             <button type="submit">Login</button>
         </form>
     </div>

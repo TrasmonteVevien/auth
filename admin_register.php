@@ -48,14 +48,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Admin Registration</title>
     <style>
        body {
-            background-color: #004080; /* dark blue */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            margin: 0;
-            font-family: Arial, sans-serif;
-            color: #004080; /* blue text by default */
+        background-color: #336699; /* lighter blue background */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+        color: #336699; /* match lighter blue text */   
         }
 
         .register-container {
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         h2 {
             margin-bottom: 20px;
-            color: #004080; /* blue */
+            color: #004080; /* dark blue */
         }
 
         input[type="text"],
@@ -94,8 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         button {
             width: 100%;
             padding: 10px;
-            background-color: #ffd633; /* yellow background */
-            color: #004080; /* blue text */
+            background-color: #8e44ad; /* purple button */
+            color: #ffffff; /* white text */
             border: none;
             border-radius: 4px;
             cursor: pointer;
@@ -105,12 +105,22 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
 
         button:hover {
-            background-color: #e6c200; /* darker yellow */
+            background-color: #7d3c98; /* darker purple */
         }
 
         .error-message {
             color: #cc3300; /* dark red for errors */
             margin: 10px 0;
+        }
+
+        a {
+            color: #8e44ad; /* purple link */
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #7d3c98;
         }
     </style>
 </head>

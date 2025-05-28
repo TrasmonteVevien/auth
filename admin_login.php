@@ -43,14 +43,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <title>Admin Login</title>
 <style>
     body {
-        background-color: #004080; /* deep blue background */
+        background-color: #336699; /* lighter blue background */
         display: flex;
         align-items: center;
         justify-content: center;
         height: 100vh;
         margin: 0;
         font-family: Arial, sans-serif;
-        color: #004080; /* blue text */
+        color: #336699; /* match lighter blue text */
     }
     .login-container {
         background-color: #ffffff; /* white box */
@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     h2 {
         margin-bottom: 20px;
-        color: #004080;
+        color: #336699;
         font-weight: bold;
     }
     input[type="text"], input[type="password"] {
@@ -84,8 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     button {
         width: 100%;
         padding: 12px;
-        background-color: #ffd633; /* yellow button */
-        color: #004080; /* blue text */
+        background-color: #6a0dad; /* purple button */
+        color: #ffffff; /* white text */
         border: none;
         border-radius: 6px;
         font-size: 18px;
@@ -95,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         margin-top: 10px;
     }
     button:hover {
-        background-color: #e6c200; /* darker yellow on hover */
+        background-color: #580a9e; /* darker purple on hover */
     }
     .error-message {
         color: #cc3300; /* dark red */

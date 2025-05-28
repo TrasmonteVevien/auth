@@ -33,7 +33,15 @@ if (isset($_POST['delete_book'])) {
     $stmt = $pdo->prepare("DELETE FROM books WHERE id = ?");
     $stmt->execute([$_POST['book_id']]);
 }
+    if (isset($_POST['verify_intruder'])) {
+    $stmt = $pdo->prepare("UPDATE failed_logins SET status = 'Verified' WHERE id = ?");
+    $stmt->execute([$_POST['intruder_id']]);
+}
 
+if (isset($_POST['delete_intruder'])) {
+    $stmt = $pdo->prepare("DELETE FROM failed_logins WHERE id = ?");
+    $stmt->execute([$_POST['intruder_id']]);
+}
 if (isset($_POST['generate_report'])) {
     header('Content-Type: text/csv');
     header('Content-Disposition: attachment;filename=site_report.csv');
@@ -47,8 +55,11 @@ if (isset($_POST['generate_report'])) {
     exit();
 }
 
+
+
+
 $books = $pdo->query("SELECT * FROM books")->fetchAll();
-$users = $pdo->query("SELECT users.id, users.username, users.phone, users.email, books.title AS borrowed_title FROM users LEFT JOIN borrowed_books ON users.id = borrowed_books.user_id LEFT JOIN books ON borrowed_books.book_id = books.id")->fetchAll();
+$users = $pdo->query("SELECT users.id, users.username, users.phone, users.email, books.title AS borrowed_title, borrowed_books.due_date FROM users LEFT JOIN borrowed_books ON users.id = borrowed_books.user_id LEFT JOIN books ON borrowed_books.book_id = books.id")->fetchAll();
 $intruders = $pdo->query("SELECT * FROM failed_logins ORDER BY attempt_time DESC")->fetchAll();
 
 $totalBooks = count($books);
@@ -64,132 +75,197 @@ $totalLogins = count($intruders);
     <title>Admin Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: #f9f9f9;
-            text-align: center;
-            padding: 20px;
+body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #d0e7ff; /* lighter blue */
+            color: #2c3e50;
+            padding: 30px;
             margin: 0;
-        }
+            line-height: 1.6;
+}
 
-        h2, h3 {
-            color: #333;
-        }
+h2, h3 {
+    color: #2c3e50;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+    text-align: center;
+}
 
-        .tab {
-            display: none;
-            max-width: 800px;
-            margin: 0 auto 20px;
-            background: #fffbea;
-            padding: 20px;
-            border-radius: 6px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            text-align: left;
-        }
+.tab {
+    display: none;
+    max-width: 1000px;
+    margin: 0 auto 20px;
+    background: #ffffff;
+    padding: 30px;
+    border: 2px solid #f1c40f; /* yellow border */
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
 
-        .active {
-            display: block;
-        }
+.active {
+    display: block;
+}
 
-        .tab-header {
-            display: inline-block;
-            margin: 5px;
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-            user-select: none;
-        }
+.tab-header {
+    display: inline-block;
+    margin: 5px;
+    padding: 12px 24px;
+    background: #8e44ad; /* purple */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    min-width: 180px;
+    text-align: center;
+}
 
-        .tab-header:hover {
-            background: #0056b3;
-        }
+.tab-header:hover {
+    background: #7d3c98;
+    transform: translateY(-2px);
+}
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
+.tab-header.active {
+    background: #7d3c98;
+    box-shadow: 0 2px 8px rgba(142, 68, 173, 0.2);
+}
 
-        th, td {
-            border: 1px solid #007bff;
-            padding: 8px;
-        }
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background: white;
+    border: 2px solid #f1c40f; /* yellow border */
+}
 
-        th {
-            background-color: #007bff;
-            color: white;
-        }
+th, td {
+    border: 1px solid #f1c40f;
+    padding: 12px;
+    text-align: left;
+}
 
-        .button {
-            background-color: #28a745;
-            color: white;
-            padding: 6px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-        }
+th {
+    background-color: #8e44ad; /* purple */
+    color: white;
+    font-weight: 500;
+}
 
-        .button:hover {
-            background-color: #218838;
-        }
+tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
 
-        input[type="text"], input[type="password"], input[type="email"] {
-            width: 100%;
-            padding: 8px;
-            margin: 5px 0 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
+.button {
+    background-color: #8e44ad; /* purple */
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
 
-        .logout {
-            background-color: #dc3545;
-            margin-bottom: 20px;
-            padding: 10px 15px;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
+.button:hover {
+    background-color: #7d3c98;
+}
 
-        .logout:hover {
-            background-color: #c82333;
-        }
+input[type="text"], input[type="password"], input[type="email"] {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #f1c40f;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #fafafa;
+}
 
-        .form-inline {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            align-items: center;
-            margin-top: 10px;
-        }
+input[type="text"]:focus, input[type="password"]:focus, input[type="email"]:focus {
+    border-color: #8e44ad;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(142, 68, 173, 0.1);
+    background-color: #ffffff;
+}
 
-        .form-inline input[type="text"] {
-            flex-grow: 1;
-            margin: 0;
-        }
+.logout {
+    background-color: #e74c3c;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 13px;
+    transition: background-color 0.2s;
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    text-decoration: none;
+}
 
-        .section-title {
-            margin-bottom: 10px;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 5px;
-            font-size: 1.2em;
-            color: #0056b3;
-        }
+.logout:hover {
+    background-color: #c0392b;
+}
+
+.form-inline {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.form-inline input[type="text"] {
+    flex-grow: 1;
+    margin: 0;
+}
+
+.section-title {
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1c40f;
+    color: #2c3e50;
+    font-size: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+#profile form {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.chart-container {
+    background: white;
+    padding: 20px;
+    border-radius: 4px;
+    border: 2px solid #f1c40f;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    margin-top: 20px;
+}
+
+.tab-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    max-width: 1000px;
+    margin: 0 auto 30px;
+    padding: 20px;
+    text-align: center;
+}
 
     </style>
 </head>
 <body>
 
     <h2>Admin Dashboard</h2>
-    <button class="logout" onclick="window.location.href='logout.php'">Logout</button>
+    <a href="logout.php" class="logout">Logout</a>
 
-    <div>
+    <div class="tab-container">
         <button class="tab-header active" onclick="openTab('profile')">🔐 Profile</button>
         <button class="tab-header" onclick="openTab('overview')">📊 Overview</button>
         <button class="tab-header" onclick="openTab('books')">📚 Books</button>
@@ -256,42 +332,67 @@ $totalLogins = count($intruders);
 
     <div id="users" class="tab">
         <h3 class="section-title">Users List</h3>
-        <table>
-            <thead>
-                <tr><th>ID</th><th>Username</th><th>Phone</th><th>Email</th><th>Borrowed Book</th></tr>
-            </thead>
-            <tbody>
-                <?php foreach ($users as $user): ?>
-                    <tr>
-                        <td><?= $user['id'] ?></td>
-                        <td><?= htmlspecialchars($user['username']) ?></td>
-                        <td><?= htmlspecialchars($user['phone']) ?></td>
-                        <td><?= htmlspecialchars($user['email']) ?></td>
-                        <td><?= htmlspecialchars($user['borrowed_title'] ?? 'None') ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
+<table>
+    <thead>
+        <tr><th>ID</th><th>Username</th><th>Phone</th><th>Email</th><th>Borrowed Book</th><th>Status</th></tr>
+    </thead>
+    <tbody>
+        <?php foreach ($users as $user): ?>
+            <tr>
+                <td><?= $user['id'] ?></td>
+                <td><?= htmlspecialchars($user['username']) ?></td>
+                <td><?= htmlspecialchars($user['phone']) ?></td>
+                <td><?= htmlspecialchars($user['email']) ?></td>
+                <td><?= htmlspecialchars($user['borrowed_title'] ?? 'None') ?></td>
+                <td>
+                    <?php
+                    if (!empty($user['due_date'])) {
+                        $dueDate = strtotime($user['due_date']);
+                        $today = strtotime(date('Y-m-d'));
+                        if ($dueDate < $today) {
+                            echo "<span style='color: red; font-weight: bold;'>Overdue</span>";
+                        } else {
+                            echo "On Time";
+                        }
+                    } else {
+                        echo "N/A";
+                    }
+                    ?>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
     </div>
 
     <div id="intruders" class="tab">
         <h3 class="section-title">Failed Login Attempts (Intruders)</h3>
         <table>
             <thead>
-                <tr><th>ID</th><th>Username</th><th>Phone</th><th>IP Address</th><th>Status</th><th>Attempt Time</th></tr>
+<tr><th>ID</th><th>Username</th><th>Phone</th><th>IP Address</th><th>Status</th><th>Attempt Time</th><th>Actions</th></tr>
             </thead>
-            <tbody>
-                <?php foreach ($intruders as $attempt): ?>
-                    <tr>
-                        <td><?= $attempt['id'] ?></td>
-                        <td><?= htmlspecialchars($attempt['username']) ?></td>
-                        <td><?= htmlspecialchars($attempt['phone']) ?></td>
-                        <td><?= htmlspecialchars($attempt['ip_address']) ?></td>
-                        <td><?= htmlspecialchars($attempt['status']) ?></td>
-                        <td><?= htmlspecialchars($attempt['attempt_time']) ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
+<tbody>
+    <?php foreach ($intruders as $attempt): ?>
+        <tr>
+            <td><?= $attempt['id'] ?></td>
+            <td><?= htmlspecialchars($attempt['username']) ?></td>
+            <td><?= htmlspecialchars($attempt['phone']) ?></td>
+            <td><?= htmlspecialchars($attempt['ip_address']) ?></td>
+            <td><?= htmlspecialchars($attempt['status']) ?></td>
+            <td><?= htmlspecialchars($attempt['attempt_time']) ?></td>
+            <td>
+                <form method="post" style="display:inline;">
+                    <input type="hidden" name="intruder_id" value="<?= $attempt['id'] ?>">
+                    <button name="verify_intruder" class="button" style="background-color:#3498db;">✅ Verify</button>
+                </form>
+                <form method="post" style="display:inline;" onsubmit="return confirm('Delete this attempt?');">
+                    <input type="hidden" name="intruder_id" value="<?= $attempt['id'] ?>">
+                    <button name="delete_intruder" class="button" style="background-color:#e74c3c;">🗑️ Delete</button>
+                </form>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+</tbody>
         </table>
     </div>
 
